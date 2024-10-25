@@ -11,8 +11,7 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
-
-	"github.com/juev/template/parse"
+	"text/template/parse"
 
 	"github.com/juev/template/internal/fmtsort"
 )
@@ -301,17 +300,16 @@ func (s *state) walk(dot reflect.Value, node parse.Node) {
 func (s *state) walkIfOrWith(typ parse.NodeType, dot reflect.Value, pipe *parse.PipeNode, list, elseList *parse.ListNode) {
 	defer s.pop(s.mark())
 	val := s.evalPipeline(dot, pipe)
-	truth, ok := isTrue(indirectInterface(val))
+	_, ok := isTrue(indirectInterface(val))
 	if !ok {
 		s.errorf("if/with can't use %v", val)
 	}
-	if truth {
-		if typ == parse.NodeWith {
-			s.walk(val, list)
-		} else {
-			s.walk(dot, list)
-		}
-	} else if elseList != nil {
+	if typ == parse.NodeWith {
+		s.walk(val, list)
+	} else {
+		s.walk(dot, list)
+	}
+	if elseList != nil {
 		s.walk(dot, elseList)
 	}
 }

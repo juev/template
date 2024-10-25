@@ -8,8 +8,7 @@ import (
 	"maps"
 	"reflect"
 	"sync"
-
-	"github.com/juev/template/parse"
+	"text/template/parse"
 )
 
 // common holds the information shared by related templates.

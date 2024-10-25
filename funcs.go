@@ -53,12 +53,12 @@ func builtins() FuncMap {
 		"urlquery": URLQueryEscaper,
 
 		// Comparisons
-		"eq": eq, // ==
-		"ge": ge, // >=
-		"gt": gt, // >
-		"le": le, // <=
-		"lt": lt, // <
-		"ne": ne, // !=
+		//"eq": eq, // ==
+		//"ge": ge, // >=
+		//"gt": gt, // >
+		//"le": le, // <=
+		//"lt": lt, // <
+		//"ne": ne, // !=
 	}
 }
 
