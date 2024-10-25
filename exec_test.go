@@ -722,9 +722,9 @@ var execTests = []execTest{
 
 	// More variadic function corner cases. Some runes would get evaluated
 	// as constant floats instead of ints. Issue 34483.
-	//{"bug18a", "{{eq . '.'}}", "true", '.', true},
-	//{"bug18b", "{{eq . 'e'}}", "true", 'e', true},
-	//{"bug18c", "{{eq . 'P'}}", "true", 'P', true},
+	{"bug18a", "{{eq . '.'}}", "true", '.', true},
+	{"bug18b", "{{eq . 'e'}}", "true", 'e', true},
+	{"bug18c", "{{eq . 'P'}}", "true", 'P', true},
 
 	{"issue56490", "{{$i := 0}}{{$x := 0}}{{range $i = .AI}}{{end}}{{$i}}", "5", tVal, true},
 	{"issue60801", "{{$k := 0}}{{$v := 0}}{{range $k, $v = .AI}}{{$k}}={{$v}} {{end}}", "0=3 1=4 2=5 ", tVal, true},

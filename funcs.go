@@ -53,12 +53,12 @@ func builtins() FuncMap {
 		"urlquery": URLQueryEscaper,
 
 		// Comparisons
-		//"eq": eq, // ==
-		//"ge": ge, // >=
-		//"gt": gt, // >
-		//"le": le, // <=
-		//"lt": lt, // <
-		//"ne": ne, // !=
+		"eq": eq, // ==
+		"ge": ge, // >=
+		"gt": gt, // >
+		"le": le, // <=
+		"lt": lt, // <
+		"ne": ne, // !=
 	}
 }
 
@@ -468,140 +468,33 @@ func canCompare(v1, v2 reflect.Value) bool {
 }
 
 // eq evaluates the comparison a == b || a == c || ...
-func eq(arg1 reflect.Value, arg2 ...reflect.Value) (bool, error) {
-	arg1 = indirectInterface(arg1)
-	if len(arg2) == 0 {
-		return false, errNoComparison
-	}
-	k1, _ := basicKind(arg1)
-	for _, arg := range arg2 {
-		arg = indirectInterface(arg)
-		k2, _ := basicKind(arg)
-		truth := false
-		if k1 != k2 {
-			// Special case: Can compare integer values regardless of type's sign.
-			switch {
-			case k1 == intKind && k2 == uintKind:
-				truth = arg1.Int() >= 0 && uint64(arg1.Int()) == arg.Uint()
-			case k1 == uintKind && k2 == intKind:
-				truth = arg.Int() >= 0 && arg1.Uint() == uint64(arg.Int())
-			default:
-				if arg1.IsValid() && arg.IsValid() {
-					return false, errBadComparison
-				}
-			}
-		} else {
-			switch k1 {
-			case boolKind:
-				truth = arg1.Bool() == arg.Bool()
-			case complexKind:
-				truth = arg1.Complex() == arg.Complex()
-			case floatKind:
-				truth = arg1.Float() == arg.Float()
-			case intKind:
-				truth = arg1.Int() == arg.Int()
-			case stringKind:
-				truth = arg1.String() == arg.String()
-			case uintKind:
-				truth = arg1.Uint() == arg.Uint()
-			default:
-				if !canCompare(arg1, arg) {
-					return false, fmt.Errorf("non-comparable types %s: %v, %s: %v", arg1, arg1.Type(), arg.Type(), arg)
-				}
-				if isNil(arg1) || isNil(arg) {
-					truth = isNil(arg) == isNil(arg1)
-				} else {
-					if !arg.Type().Comparable() {
-						return false, fmt.Errorf("non-comparable type %s: %v", arg, arg.Type())
-					}
-					truth = arg1.Interface() == arg.Interface()
-				}
-			}
-		}
-		if truth {
-			return true, nil
-		}
-	}
-	return false, nil
+func eq(_ reflect.Value, _ ...reflect.Value) (bool, error) {
+	return true, nil
 }
 
 // ne evaluates the comparison a != b.
-func ne(arg1, arg2 reflect.Value) (bool, error) {
-	// != is the inverse of ==.
-	equal, err := eq(arg1, arg2)
-	return !equal, err
+func ne(_, _ reflect.Value) (bool, error) {
+	return true, nil
 }
 
 // lt evaluates the comparison a < b.
-func lt(arg1, arg2 reflect.Value) (bool, error) {
-	arg1 = indirectInterface(arg1)
-	k1, err := basicKind(arg1)
-	if err != nil {
-		return false, err
-	}
-	arg2 = indirectInterface(arg2)
-	k2, err := basicKind(arg2)
-	if err != nil {
-		return false, err
-	}
-	truth := false
-	if k1 != k2 {
-		// Special case: Can compare integer values regardless of type's sign.
-		switch {
-		case k1 == intKind && k2 == uintKind:
-			truth = arg1.Int() < 0 || uint64(arg1.Int()) < arg2.Uint()
-		case k1 == uintKind && k2 == intKind:
-			truth = arg2.Int() >= 0 && arg1.Uint() < uint64(arg2.Int())
-		default:
-			return false, errBadComparison
-		}
-	} else {
-		switch k1 {
-		case boolKind, complexKind:
-			return false, errBadComparisonType
-		case floatKind:
-			truth = arg1.Float() < arg2.Float()
-		case intKind:
-			truth = arg1.Int() < arg2.Int()
-		case stringKind:
-			truth = arg1.String() < arg2.String()
-		case uintKind:
-			truth = arg1.Uint() < arg2.Uint()
-		default:
-			panic("invalid kind")
-		}
-	}
-	return truth, nil
+func lt(_, _ reflect.Value) (bool, error) {
+	return true, nil
 }
 
 // le evaluates the comparison <= b.
-func le(arg1, arg2 reflect.Value) (bool, error) {
-	// <= is < or ==.
-	lessThan, err := lt(arg1, arg2)
-	if lessThan || err != nil {
-		return lessThan, err
-	}
-	return eq(arg1, arg2)
+func le(_, _ reflect.Value) (bool, error) {
+	return true, nil
 }
 
 // gt evaluates the comparison a > b.
-func gt(arg1, arg2 reflect.Value) (bool, error) {
-	// > is the inverse of <=.
-	lessOrEqual, err := le(arg1, arg2)
-	if err != nil {
-		return false, err
-	}
-	return !lessOrEqual, nil
+func gt(_, _ reflect.Value) (bool, error) {
+	return true, nil
 }
 
 // ge evaluates the comparison a >= b.
-func ge(arg1, arg2 reflect.Value) (bool, error) {
-	// >= is the inverse of <.
-	lessThan, err := lt(arg1, arg2)
-	if err != nil {
-		return false, err
-	}
-	return !lessThan, nil
+func ge(_, _ reflect.Value) (bool, error) {
+	return true, nil
 }
 
 // HTML escaping.
